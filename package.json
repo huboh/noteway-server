@@ -5,7 +5,9 @@
   "main": "build/index.js",
   "types": "build/types",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "build": "npx tsc",
+    "start": "npx nodemon -r dotenv/config build/index.js"
   },
   "repository": {
     "type": "git",
