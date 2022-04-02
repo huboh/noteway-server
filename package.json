@@ -1,0 +1,25 @@
+{
+  "name": "noteway-server",
+  "version": "1.0.0",
+  "description": "👻 api server for noteway, a notes-as-a-service platform for creating, reading & managing notes e.t.c",
+  "main": "build/index.js",
+  "types": "build/types",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/huboh/noteway-server.git"
+  },
+  "keywords": [
+    "api",
+    "graphql",
+    "apollo"
+  ],
+  "author": "huboh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/huboh/noteway-server/issues"
+  },
+  "homepage": "https://github.com/huboh/noteway-server#readme"
+}

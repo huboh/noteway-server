@@ -1,0 +1,12 @@
+/node_modules
+
+/build
+*.tsbuildinfo
+.env
+.env.local
+notes.md
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
