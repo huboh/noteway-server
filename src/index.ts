@@ -9,16 +9,18 @@ import { ApolloServer } from 'apollo-server-express';
 
 
 const { PORT, MONGO_CONNECTION_STRING } = process.env;
-
-const app = express();
 const host = 'localhost';
 const port = PORT || 5000;
+
+const app = express();
 const database = new Database('hey');
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: ({ req, res }) => ({
-    userId: req.headers.authorization
+  context: ({ req: request, res: response }) => ({
+    request,
+    response,
+    userId: request.headers.authorization
   })
 });
 
