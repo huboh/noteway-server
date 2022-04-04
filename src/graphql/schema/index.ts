@@ -40,6 +40,24 @@ const schema = gql(`#graphql
     noteId: ID
   }
 
+  input UserArchivedNotesInput {
+    userId: ID
+    email: String
+    username: String
+  }
+
+  input UserSignupInput {
+    email: String!
+    password: ID!
+    username: String
+  }
+
+  input UserLoginInput {
+    email: String
+    password: ID!
+    username: String
+  }
+
   ### Interfaces ###
 
   """An object with an ID"""
@@ -71,6 +89,22 @@ const schema = gql(`#graphql
     totalCount: Int!
     pageInfo: PageInfo!
     nodes: [Collaborator]!
+  }
+
+  ### Responses ###
+
+  type UserDeleteResponse {
+    deleted: Boolean
+  }
+
+  type UserSignupResponse {
+    token: String
+    user: User
+  }
+
+  type UserLoginResponse {
+    token: String
+    user: User
   }
 
   type PageInfo {
@@ -141,8 +175,17 @@ const schema = gql(`#graphql
     note(id: ID!): Note
     user(id: UserSearchInput!): User
     notes(filter: UserNotesInput!): [NoteConnection]
-    archivedNotes(filter: UserNotesInput!): [NoteConnection]
-    collaborator(id: CollaboratorSearchInput!): Collaborator
+    archivedNotes(filter: UserArchivedNotesInput!): [NoteConnection]
+
+    collaborator(filter: CollaboratorSearchInput!): Collaborator
+    collaborators(noteId: ID!): CollaboratorConnection
+  }
+
+  type Mutation {
+    # user object mutation
+    userDelete(userId: ID!): UserDeleteResponse
+    userLogin(loginCredentials: UserLoginInput): UserLoginResponse
+    userSignup(signupCredentials: UserSignupInput): UserSignupResponse
   }
 
 `);
