@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+
+import * as api from './api';
 import { ConnectProps } from "../types";
 
 export default class Database {
@@ -6,8 +8,12 @@ export default class Database {
   private static _instance: Database;
   private connection = mongoose.connection;
 
-  constructor(as?: any) {
-    console.log(as);
+  // * models api
+  User = api.User;
+  Note = api.Note;
+  Collaborator = api.Collaborator;
+
+  constructor() {
     return Database._instance ?? (Database._instance = this);
   }
 
