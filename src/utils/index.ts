@@ -1,7 +1,8 @@
 import errors from "./errors";
-import { StartServerProps, PaginateQueryProps } from "../types";
+import { StartServerProps, PaginateQueryProps, AuthType } from "../types";
 import { isDevelopment, DEFAULT_SERVER_ERROR_MESSAGE, PAGINATION_LIMIT, PAGINATION_INITIAL_PAGE } from '../utils/constants';
 
+import { Request } from 'express';
 import { isValidObjectId } from 'mongoose';
 import { ApolloServerExpressConfig } from "apollo-server-express";
 
@@ -48,3 +49,10 @@ export const paginateQuery = async <T>(props: PaginateQueryProps<T>) => {
     }
   };
 };
+
+export function getHeaderAuthToken(header: Request['headers'], type: AuthType) {
+  const authHeader = header.authorization || '';
+  const [authType, authToken] = authHeader.trim().split(' ');
+
+  return type === authType ? authToken : null;
+}
