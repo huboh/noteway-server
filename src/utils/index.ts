@@ -6,6 +6,8 @@ import { Request } from 'express';
 import { isValidObjectId } from 'mongoose';
 import { ApolloServerExpressConfig } from "apollo-server-express";
 
+export const extractNameFromEmail = (email?: string) => (email || '').replace(/@.*/, '');
+
 export const startServer = ({ app, port, host, server }: StartServerProps) => {
   app.listen(Number(port), host, () => console.log(`app listening on ${host}:${port}${server?.graphqlPath}`)
   );
