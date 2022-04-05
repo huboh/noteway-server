@@ -98,12 +98,12 @@ const schema = gql(`#graphql
   }
 
   type UserSignupResponse {
-    token: String
+    authToken: String
     user: User
   }
 
   type UserLoginResponse {
-    token: String
+    authToken: String
     user: User
   }
 
@@ -136,6 +136,8 @@ const schema = gql(`#graphql
     id: ID!
     noteId: ID!
     addedBy: User!
+    createdAt: Date!
+    updatedAt: Date!
     permissions: CollaboratorPermission!
   }
 
@@ -144,7 +146,7 @@ const schema = gql(`#graphql
     id: ID!
     name: String
     email: String!
-    createAt: Date!
+    createdAt: Date!
     updatedAt: Date!
     username: String!
     avatarUrl: String
@@ -159,8 +161,8 @@ const schema = gql(`#graphql
     tags: [Tag]!
     author: User!
     title: String!
-    createAt: Date!
     content: String!
+    createdAt: Date!
     updatedAt: Date!
     isPrivate: Boolean!
     isArchived: Boolean!
