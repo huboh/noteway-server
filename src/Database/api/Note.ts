@@ -26,7 +26,7 @@ export default {
   },
 
   async getNotes(queryFilter: GetNotesQueryFilter<typeof Note>) {
-    const { userId, authorId, limit, page } = queryFilter;
+    const { userId, authorId, limit, page, query = {} } = queryFilter;
     const isRequestedByAuthor = userId === authorId;
     // if note is requested by the author, we dont care if its private
     const isPrivateNote = isRequestedByAuthor ? undefined : false;
@@ -38,6 +38,7 @@ export default {
       limit,
       model: Note,
       query: JSON.parse(JSON.stringify({
+        ...query,
         isPrivate: isPrivateNote,
         authorId,
       }))
@@ -54,17 +55,15 @@ export default {
       throw new errors.ForbiddenError('please login to create a new note');
     }
 
-    return {
-      note: await Note.create({
-        visibility: noteVisibility,
-        isPrivate: noteVisibility === 'private',
-        isArchived,
-        authorId: userId,
-        content,
-        title,
-        tag,
-      })
-    };
+    return Note.create({
+      visibility: noteVisibility,
+      isPrivate: noteVisibility === 'private',
+      isArchived,
+      authorId: userId,
+      content,
+      title,
+      tag,
+    });
   },
 
   async deleteNote(queryFilter: DeleteNoteQueryFilter) {
