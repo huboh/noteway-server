@@ -116,7 +116,7 @@ const schema = gql(`#graphql
 
   type Tag {
     color: Color
-    label: String!
+    label: String
   }
 
   type UserPreference {
@@ -158,7 +158,7 @@ const schema = gql(`#graphql
 
   type Note implements Node {
     id: ID!
-    tags: [Tag]!
+    tag: Tag!
     author: User!
     title: String!
     content: String!
