@@ -30,8 +30,8 @@ export const formatError: ApolloServerExpressConfig['formatError'] = (error) => 
 export const paginateQuery = async <T>(props: PaginateQueryProps<T>) => {
   let { limit, page, model, query } = props;
 
-  limit = isNaN(Number(limit)) ? PAGINATION_LIMIT : limit;
-  page = isNaN(Number(page)) ? PAGINATION_INITIAL_PAGE : page;
+  limit = (isNaN(Number(limit || undefined)) ? PAGINATION_LIMIT : limit) as number;
+  page = (isNaN(Number(page || undefined)) ? PAGINATION_INITIAL_PAGE : page) as number;
 
   const currentPage = (page <= 1) ? 1 : page;
   const previousPage = currentPage - 1;
