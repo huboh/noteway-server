@@ -1,6 +1,12 @@
 import errors from "../../utils/errors";
 import password from "../../utils/password";
-import { LoginCredentials, User } from '../../types';
+import { DEFAULT_NOTE_VISIBILITY } from "../../utils/constants";
+import { LoginCredentials, User, NoteVisibility } from '../../types';
+
+export const getNoteVisibility = (visibility?: NoteVisibility): NoteVisibility => {
+  // @ts-ignore
+  return (visibility !== 'private' || visibility !== 'public') || DEFAULT_NOTE_VISIBILITY;
+};
 
 export const compareLoginCredentials = async (loginCredentials: LoginCredentials, user: User | null) => {
   if (user) {
