@@ -5,14 +5,11 @@ import { ApolloServer } from "apollo-server-express";
 
 export type AuthType = 'Bearer' | 'Basic';
 
+export type NoteVisibility = 'public' | 'private';
+
 export type Context = Awaited<ReturnType<typeof context>>;
 
 export type Resolvers<S, A, C, I> = { [T: string]: (source: S, argument: A, context: C, info: I) => unknown; };
-
-export const enum NoteVisibility {
-  PUBLIC = 'PUBLIC',
-  PRIVATE = 'PRIVATE'
-}
 
 export const enum ThemePreference {
   DARK = 'dark',
@@ -25,8 +22,8 @@ export interface Token {
 }
 
 export interface PaginateQueryProps<T> {
-  page: number;
-  limit: number;
+  page?: number;
+  limit?: number;
   model: Model<T>;
   query: FilterQuery<T>;
 }
@@ -57,6 +54,7 @@ export interface ConnectProps {
   onDisconnect?(): void;
 }
 
+/******** queries input **********/
 export interface UserExistsQueryFilter {
   id?: string;
   email?: string;
