@@ -1,3 +1,4 @@
+import { Note } from '../../types';
 import { Schema, model } from 'mongoose';
 import { DEFAULT_NOTE_VISIBILITY } from '../../utils/constants';
 
@@ -15,12 +16,14 @@ const NoteSchema = new Schema({
     type: Boolean, default: false
   },
   visibility: {
-    type: String, default: DEFAULT_NOTE_VISIBILITY
+    type: String,
+    lowercase: true,
+    default: DEFAULT_NOTE_VISIBILITY
   },
-  tags: [{
+  tag: {
     color: { type: String, default: null, maxlength: 12 },
-    label: { type: String, default: null, maxlength: 120, required: true, unique: true }
-  }],
+    label: { type: String, default: null, maxlength: 120 }
+  },
   title: {
     type: String,
     lowercase: true,
@@ -32,7 +35,7 @@ const NoteSchema = new Schema({
   }
 );
 
-const Note = model('Note', NoteSchema);
+const Note = model<Note>('Note', NoteSchema);
 
 export {
   Note as default

@@ -73,6 +73,31 @@ export interface DeleteUserQueryFilter {
   username?: string;
 }
 
+export interface GetNoteQueryFilter {
+  id?: string;
+  userId: string;
+}
+
+export interface GetNotesQueryFilter<T> extends Omit<GetNoteQueryFilter, 'id'>, Pick<PaginateQueryProps<T>, 'page' | 'limit'> {
+  authorId?: string;
+}
+
+export interface CreateNoteQueryFilter {
+  userId: string;
+  note: Partial<Note>;
+}
+
+export interface DeleteNoteQueryFilter {
+  noteId: string;
+  userId: string;
+}
+
+export interface UpdateNoteQueryFilter {
+  noteId: string;
+  userId: string;
+  note: Partial<Note>;
+}
+
 export interface SignupCredentials {
   email?: string;
   username?: string;
@@ -83,6 +108,11 @@ export interface LoginCredentials {
   email?: string;
   username?: string;
   password: string;
+}
+
+export interface Tag {
+  color: string;
+  label: string;
 }
 
 export interface User {
@@ -96,4 +126,15 @@ export interface User {
   preferences: {
     theme: string;
   };
+}
+
+export interface Note {
+  id: string;
+  tag: Tag;
+  title: string;
+  content: string;
+  authorId: string;
+  isPrivate: boolean;
+  isArchived: boolean;
+  visibility: NoteVisibility;
 }
