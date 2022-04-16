@@ -9,10 +9,10 @@ import { getHeaderAuthToken } from "..";
  */
 const parse = (header: Request['headers'], authType: AuthType) => {
   try {
-    const token = getHeaderAuthToken(header, authType) ?? '';
-    const validatedToken = tokens.verifyToken(token);
+    const authToken = getHeaderAuthToken(header, authType);
+    const token = tokens.verifyToken(String(authToken));
 
-    return validatedToken || null;
+    return token;
 
   } catch (error) {
     return null;
@@ -21,4 +21,4 @@ const parse = (header: Request['headers'], authType: AuthType) => {
 
 export default {
   parse
-};;
+};
