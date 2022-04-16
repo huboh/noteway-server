@@ -11,14 +11,26 @@ const schema = gql(`#graphql
   ### Enums ###
 
   enum NoteVisibility {
-    PUBLIC
-    PRIVATE
+    public
+    private
   }
 
   enum Theme {
-    DARK
-    LIGHT
-    SYSTEM_DEFAULT
+    dark
+    light
+    system
+  }
+
+  enum NoteSorting {
+    title
+    createdAt
+    updatedAt
+  }
+
+  enum CollaboratorRole {
+    editor
+    viewer
+    commenter
   }
 
   ### Inputs ###
@@ -58,11 +70,46 @@ const schema = gql(`#graphql
     username: String
   }
 
+  input TagInput {
+    color: Color
+    label: String
+  }
+
+  input CollaboratorInput {
+    userId: ID!
+    role: CollaboratorRole
+  }
+
+  input NoteCreateInput {
+    tag: TagInput
+    title: String!
+    content: String!
+    isPinned: Boolean
+    isPrivate: Boolean
+    isStarred: Boolean
+    isArchived: Boolean
+    visibility: NoteVisibility
+    collaborators: [CollaboratorInput!]
+  }
+
+  input NoteUpdateInput {
+    title: String
+    content: String
+    isArchived: Boolean
+    isPrivate: Boolean
+    isPinned: Boolean
+    isStarred: Boolean
+    isAddedToTrash: Boolean
+    visibility: NoteVisibility
+  }
+
   ### Interfaces ###
 
   """An object with an ID"""
   interface Node {
     id: ID!
+    createdAt: Date!
+    updatedAt: Date!
   }
 
   interface NoteAuthor {
@@ -73,22 +120,22 @@ const schema = gql(`#graphql
   }
 
   interface Connection {
-    totalCount: Int!
+    totalNodes: Int!
     pageInfo: PageInfo!
   }
 
   ### Connections ###
 
-  type NoteConnection {
-    nodes: [Note]!
-    totalCount: Int!
+  type NoteConnection implements Connection {
+    nodes: [Note!]!
+    totalNodes: Int!
     pageInfo: PageInfo!
   }
 
-  type CollaboratorConnection {
-    totalCount: Int!
+  type CollaboratorConnection implements Connection {
+    nodes: [Collaborator!]!
+    totalNodes: Int!
     pageInfo: PageInfo!
-    nodes: [Collaborator]!
   }
 
   ### Responses ###
@@ -107,49 +154,80 @@ const schema = gql(`#graphql
     user: User
   }
 
-  type PageInfo {
-    total: Int
-    limit: Int
-    currentPage: Int
-    previousPage: Int
+  type NoteDeleteResponse {
+    deleted: Boolean
   }
 
-  type Tag {
-    color: Color
-    label: String
+  type PageInfo {
+    limit: Int!
+    total: Int!
+    nextPage: Int!
+    currentPage: Int!
+    previousPage: Int!
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
   }
 
   type UserPreference {
     theme: Theme!
+    sortNoteBy: NoteSorting!
   }
-
-  type CollaboratorPermission {
-    canAddCollaborators: Boolean!
-  }
-
 
   ##############
 
+  type Tag implements Node {
+    id: ID!
+    label: ID!
+    tagId: ID!
+    userId: ID!
+    color: Color
+    createdAt: Date!
+    updatedAt: Date!
+  }
 
-  """A collaborator is an individual on Noteway that has been added as a collaborator on a note"""
+  type NoteActivity implements Node {
+    id: ID!
+    noteId: ID!
+    action: String!
+    activityId: ID!
+    initiator: User!
+    createdAt: Date!
+    updatedAt: Date!
+  }
+
+  type NoteAttachment implements Node {
+    id: ID!
+    fileSize: Int!
+    fileType: String!
+    attachmentId: ID!
+    createdAt: Date!
+    updatedAt: Date!
+  }
+
+  """A collaborator is an individual who can view, comment or edit a note on Noteway"""
   type Collaborator implements Node {
     id: ID!
     noteId: ID!
-    addedBy: User!
+    userId: ID!
+    createdBy: User!
     createdAt: Date!
     updatedAt: Date!
-    permissions: CollaboratorPermission!
+    collaboratorId: ID!
+    role: CollaboratorRole!
   }
+
 
   """A user is an individual's account on Noteway that owns notes"""
   type User implements Node & NoteAuthor {
     id: ID!
+    userId: ID!
     name: String
     email: String!
     createdAt: Date!
     updatedAt: Date!
     username: String!
-    avatarUrl: String
+    avatarUrl: String!
+    isDeactivated: Boolean!
     isEmailVerified: Boolean!
     preferences: UserPreference!
     notes(filter: UserNotesInput): NoteConnection!
@@ -158,26 +236,37 @@ const schema = gql(`#graphql
 
   type Note implements Node {
     id: ID!
-    tag: Tag!
+    tag: Tag
+    noteId: ID!
+    authorId: ID!
     author: User!
     title: String!
     content: String!
     createdAt: Date!
     updatedAt: Date!
+    starredBy: [User!]!
+    isPinned: Boolean!
     isPrivate: Boolean!
+    isStarred: Boolean!
     isArchived: Boolean!
+    isAddedToTrash: Boolean!
     visibility: NoteVisibility!
-    collaborators(filter: UserNotesInput): CollaboratorConnection!
+    activities: [NoteActivity!]!
+    attachments: [NoteAttachment!]!
+    collaborators(filter: UserNotesInput): [Collaborator!]!
   }
 
 
   ### Root
   type Query {
+    # user query
     me: User
-    note(id: ID!): Note
-    user(id: UserSearchInput!): User
-    notes(filter: UserNotesInput!): [NoteConnection]
-    archivedNotes(filter: UserArchivedNotesInput!): [NoteConnection]
+    user(filter: UserSearchInput!): User
+
+    # note query
+    note(noteId: ID!): Note
+    notes(authorId: ID!): NoteConnection
+    archivedNotes(authorId: ID!): NoteConnection
 
     collaborator(filter: CollaboratorSearchInput!): Collaborator
     collaborators(noteId: ID!): CollaboratorConnection
@@ -188,6 +277,11 @@ const schema = gql(`#graphql
     userDelete(userId: ID!): UserDeleteResponse
     userLogin(loginCredentials: UserLoginInput): UserLoginResponse
     userSignup(signupCredentials: UserSignupInput): UserSignupResponse
+
+    # note object mutation
+    noteDelete(noteId: ID!): NoteDeleteResponse
+    noteUpdate(noteId: ID!, noteDetails: NoteUpdateInput!): Note
+    noteCreate(noteDetails: NoteCreateInput!): Note
   }
 
 `);
