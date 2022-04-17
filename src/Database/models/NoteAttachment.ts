@@ -1,7 +1,9 @@
 import User from './User';
-import { NoteAttachment } from '../../types';
+
+import * as Types from '../../types';
 
 import { Schema, model } from 'mongoose';
+
 
 const NoteAttachmentSchema = new Schema({
   fileType: {
@@ -16,7 +18,7 @@ const NoteAttachmentSchema = new Schema({
   }
 );
 
-const NoteAttachment = model<NoteAttachment>('NoteAttachment', NoteAttachmentSchema);
+const NoteAttachment = model<Types.NoteAttachment>('NoteAttachment', NoteAttachmentSchema);
 
 export {
   NoteAttachment as default

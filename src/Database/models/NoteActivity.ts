@@ -1,8 +1,10 @@
 import User from './User';
-import { NoteActivity } from '../../types';
+
+import * as Types from '../../types';
 
 import { Schema, model } from 'mongoose';
 import mongooseAutoPopulate from 'mongoose-autopopulate';
+
 
 const NoteActivitySchema = new Schema({
   activityId: {
@@ -32,7 +34,7 @@ const NoteActivitySchema = new Schema({
 
 NoteActivitySchema.plugin(mongooseAutoPopulate);
 
-const NoteActivity = model<NoteActivity>('NoteActivity', NoteActivitySchema);
+const NoteActivity = model<Types.NoteActivity>('NoteActivity', NoteActivitySchema);
 
 export {
   NoteActivity as default

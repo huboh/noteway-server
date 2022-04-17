@@ -1,17 +1,30 @@
+import User from './User';
+
+import * as Types from '../../types';
+import * as Constants from '../../utils/constants';
+
 import { Schema, model } from 'mongoose';
+import mongooseAutoPopulate from 'mongoose-autopopulate';
+
 
 const CollaboratorSchema = new Schema({
   noteId: {
-    type: Schema.Types.ObjectId, required: true, unique: true
-  },
-  addedBy: {
-    type: Schema.Types.ObjectId, required: true, unique: true
+    type: String, required: true
   },
   userId: {
-    type: Schema.Types.ObjectId, required: true
+    type: String, required: true
   },
-  permission: {
-    canAddCollaborators: { type: Boolean, default: false }
+  collaboratorId: {
+    type: String, required: true, unique: true
+  },
+  createdBy: {
+    type: Schema.Types.ObjectId,
+    autopopulate: true,
+    required: true,
+    ref: User,
+  },
+  role: {
+    type: String, default: Constants.DEFAULT_COLLABORATOR_ROLE
   },
 },
   {
@@ -19,7 +32,9 @@ const CollaboratorSchema = new Schema({
   }
 );
 
-const Collaborator = model('Collaborator', CollaboratorSchema);
+CollaboratorSchema.plugin(mongooseAutoPopulate);
+
+const Collaborator = model<Types.Collaborator>('Collaborator', CollaboratorSchema);
 
 export {
   Collaborator as default
