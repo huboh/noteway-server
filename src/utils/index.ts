@@ -1,60 +1,116 @@
+import uuid from './uuid';
+import mongo from './mongo';
 import errors from "./errors";
-import { StartServerProps, PaginateQueryProps, AuthType } from "../types";
-import { isDevelopment, DEFAULT_SERVER_ERROR_MESSAGE, PAGINATION_LIMIT, PAGINATION_INITIAL_PAGE } from '../utils/constants';
+
+import * as Types from "../types";
+import * as Constants from '../utils/constants';
 
 import { Request } from 'express';
-import { isValidObjectId } from 'mongoose';
+import { MongooseError } from 'mongoose';
 import { ApolloServerExpressConfig } from "apollo-server-express";
 
-export const extractNameFromEmail = (email?: string) => (email || '').replace(/@.*/, '');
 
-export const startServer = ({ app, port, host, server }: StartServerProps) => {
-  app.listen(Number(port), host, () => console.log(`app listening on ${host}:${port}${server?.graphqlPath}`)
+
+export const extractNameFromEmail = (email?: string) => (
+  String(email).replace(/@.*/, '')
+);
+
+export const isInstanceof = <T extends Function>(value: unknown, classes: T[]): value is T => (
+  classes.some((c) => value instanceof c)
+);
+
+export const startServer = ({ app, port, host, server }: Types.StartServerProps) => {
+  app.listen(
+    Number(port), host, () => console.log(`app listening on ${host}:${port}${server?.graphqlPath}`)
   );
 };
 
-export const validateMongoObjectId = (...ids: unknown[]) => ids.forEach(id => {
-  if (id && !isValidObjectId(id)) {
-    throw new errors.ValidationError('invalid idenitifier');
-  }
-});
+export const validateIdentifiers: Types.ValidateIdentifiers = (ids) => {
+  type Key = keyof Parameters<typeof validateIdentifiers>[0];
+
+  Object.keys(ids).forEach(key => {
+    switch (key as Key) {
+      case 'uuid': ids.uuid && uuid.validateUuid(...ids.uuid); break;
+      case 'mongoId': ids.mongoId && mongo.validateId(...ids.mongoId); break;
+      default: break;
+    }
+  });
+};
 
 export const formatError: ApolloServerExpressConfig['formatError'] = (error) => ({
-  message: error.message || DEFAULT_SERVER_ERROR_MESSAGE,
+  name: error.originalError?.name || error.name,
+  message: error.message || Constants.DEFAULT_SERVER_ERROR_MESSAGE,
   path: error.path,
   locations: error.locations,
-  stack: isDevelopment ? (error.stack?.split?.('\n') ?? []) : undefined,
-  extensions: isDevelopment ? error.extensions : undefined,
+  stack: Constants.isDevelopment ? (error.stack?.split?.('\n') ?? []) : undefined,
+  extensions: Constants.isDevelopment ? error.extensions : undefined,
 });
 
-export const paginateQuery = async <T>(props: PaginateQueryProps<T>) => {
-  let { limit, page, model, query } = props;
+const getQueryLimit = (limit?: number) => (
+  isNaN(Number(limit || undefined)) ? Constants.PAGINATION_LIMIT : limit as number
+);
 
-  limit = (isNaN(Number(limit || undefined)) ? PAGINATION_LIMIT : limit) as number;
-  page = (isNaN(Number(page || undefined)) ? PAGINATION_INITIAL_PAGE : page) as number;
+const getQueryPage = (page?: number) => (
+  isNaN(Number(page || undefined)) ? Constants.PAGINATION_INITIAL_PAGE : page as number
+);
 
+export const paginateQuery = async <T>(props: Types.PaginateQueryProps<T>) => {
+  const limit = getQueryLimit(props.limit);
+  const page = getQueryPage(props.page);
   const currentPage = (page <= 1) ? 1 : page;
   const previousPage = currentPage - 1;
   const nextPage = currentPage + 1;
   const skip = previousPage * limit;
-  const nodes = await model.find({ ...query }).skip(skip).limit(limit);
+
+  const [nodes, totalNodes] = await Promise.all([
+    props.model.find({ ...props.query }).skip(skip).limit(limit),
+    props.model.countDocuments({ ...props.query })
+  ]);
+
   const total = nodes.length;
 
   return {
     nodes,
+    totalNodes,
     pageInfo: {
-      limit,
-      total,
-      nextPage,
+      hasPreviousPage: currentPage > 1,
+      hasNextPage: (limit * currentPage) < totalNodes,
       currentPage,
       previousPage,
+      nextPage,
+      total,
+      limit,
     }
   };
 };
 
-export function getHeaderAuthToken(header: Request['headers'], type: AuthType) {
+export const getHeaderAuthToken = (header: Request['headers'], type: Types.AuthType) => {
   const authHeader = header.authorization || '';
   const [authType, authToken] = authHeader.trim().split(' ');
 
   return type === authType ? authToken : null;
-}
+};
+
+export const handleMongooseError = (error: MongooseError) => {
+  switch (error.name) {
+    case 'CastError': {
+      throw new errors.InvalidPayloadError(error.message);
+    }
+
+    case 'ValidationError': {
+      Object.values((<any> error).errors).forEach(err => {
+        throw new errors.ValidationError((err as any).properties.message);
+      }); break;
+    }
+
+    default: {
+      throw new errors.ServerError(Constants.DEFAULT_SERVER_ERROR_MESSAGE);
+    }
+  }
+};
+
+export const handleError = (error: unknown) => {
+  if (error instanceof MongooseError) {
+    handleMongooseError(error);
+  }
+};
