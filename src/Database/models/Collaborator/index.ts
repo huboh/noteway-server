@@ -1,7 +1,7 @@
-import User from './User';
+import User from '../User';
 
-import * as Types from '../../types';
-import * as Constants from '../../utils/constants';
+import * as Types from '../../../types';
+import * as Constants from '../../../utils/constants';
 
 import { Schema, model } from 'mongoose';
 import mongooseAutoPopulate from 'mongoose-autopopulate';

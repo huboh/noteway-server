@@ -1,8 +1,8 @@
 import validator from 'validator';
 import { Schema, model } from 'mongoose';
 
-import * as Types from '../../types';
-import * as Constants from '../../utils/constants';
+import * as Types from '../../../types';
+import * as Constants from '../../../utils/constants';
 
 
 const UserSchema = new Schema({

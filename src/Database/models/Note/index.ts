@@ -1,11 +1,11 @@
-import Tag from './Tag';
-import User from './User';
-import Collaborator from './Collaborator';
-import NoteActivity from './NoteActivity';
-import NoteAttachment from './NoteAttachment';
+import Tag from '../Tag';
+import User from '../User';
+import Collaborator from '../Collaborator';
+import NoteActivity from '../NoteActivity';
+import NoteAttachment from '../NoteAttachment';
 
-import * as Types from '../../types';
-import * as Constants from '../../utils/constants';
+import * as Types from '../../../types';
+import * as Constants from '../../../utils/constants';
 
 import { Schema, model } from 'mongoose';
 import mongooseAutoPopulate from 'mongoose-autopopulate';
