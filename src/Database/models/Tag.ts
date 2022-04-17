@@ -1,4 +1,4 @@
-import { Tag } from '../../types';
+import * as Types from '../../types';
 
 import { Schema, model } from 'mongoose';
 
@@ -21,7 +21,7 @@ const TagSchema = new Schema({
   }
 );
 
-const Tag = model<Tag>('Tag', TagSchema);
+const Tag = model<Types.Tag>('Tag', TagSchema);
 
 export {
   Tag as default
