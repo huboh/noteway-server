@@ -1,7 +1,7 @@
 import { context } from "..";
 import { Express } from "express";
+import { Model, FilterQuery } from 'mongoose';
 import { ApolloServer } from "apollo-server-express";
-import { Model, FilterQuery, Document } from 'mongoose';
 
 export type AuthType = 'Bearer' | 'Basic';
 
@@ -273,3 +273,11 @@ export type CreateUpdateActivity = (note: Note, user: User) => any;
 
 export type DeleteNoteCollaborators = (note: Note, user: User) => any;
 
+
+
+interface Identifiers {
+  uuid?: unknown[];
+  mongoId?: unknown[];
+}
+
+export type ValidateIdentifiers = (ids: Identifiers) => void | never;
