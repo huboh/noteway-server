@@ -1,41 +1,36 @@
 import errors from '../errors';
 import { isInstanceof } from '../';
-import jsonWebToken from 'jsonwebtoken';
-import { SESSION_EXPIRED_MESSAGE, SESSION_INVALID_MESSAGE } from '../constants';
+import { SESSION_EXPIRED_MESSAGE, SESSION_INVALID_MESSAGE } from '../../constants';
+import { sign, verify, SignOptions, VerifyOptions, JsonWebTokenError, NotBeforeError, TokenExpiredError } from 'jsonwebtoken';
 
-const { TOKEN_SECRET } = process.env;
+export const { TOKEN_SECRET } = process.env;
 
-const generateToken = (payload: object, options: jsonWebToken.SignOptions = {}) => (
-  jsonWebToken.sign(payload, TOKEN_SECRET!, {
+export const generateToken = (payload: object, options: SignOptions = {}) => {
+  return sign(payload, TOKEN_SECRET!, {
     expiresIn: 28800, // 8hrs in seconds
     ...options
-  })
-);
+  });
+};
 
-const verifyToken = (token: string, options: jsonWebToken.VerifyOptions = {}) => (
-  jsonWebToken.verify(token, TOKEN_SECRET!, {
+export const verifyToken = (token: string, options: VerifyOptions = {}) => {
+  return verify(token, TOKEN_SECRET!, {
     ...options
-  })
-);
+  });
+};
 
-const handleTokenError = (error: unknown) => {
-  const { JsonWebTokenError, NotBeforeError, TokenExpiredError } = jsonWebToken;
-  const isJwtError = isInstanceof(error, [JsonWebTokenError, NotBeforeError, TokenExpiredError]);
-
-  if (!isJwtError) {
+export const handleTokenError = (error: unknown) => {
+  if (!isInstanceof(error, [JsonWebTokenError, NotBeforeError, TokenExpiredError])) {
     throw error;
   }
 
-  const isExpiredToken = error.name === 'TokenExpiredError';
-  const errorMessage = isExpiredToken ? SESSION_EXPIRED_MESSAGE : SESSION_INVALID_MESSAGE;
-
   throw new errors.AuthenticationError(
-    errorMessage
+    error.name === 'TokenExpiredError' ? SESSION_EXPIRED_MESSAGE : SESSION_INVALID_MESSAGE
   );
 };
 
 export default {
   verifyToken,
   generateToken,
-  handleTokenError
+  handleTokenError,
+  TOKEN_SECRET
 };
