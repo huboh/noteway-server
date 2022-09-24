@@ -1,0 +1,1 @@
+export const GraphQl_Path = '/api/graphql';

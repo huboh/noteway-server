@@ -1,4 +1,6 @@
-import * as Types from "../../types";
+import * as Types from "../types";
+
+export * from "./graphql";
 
 const { NODE_ENV } = process.env;
 
