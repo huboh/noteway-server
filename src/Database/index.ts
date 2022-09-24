@@ -1,19 +1,20 @@
-import mongoose from "mongoose";
-
 import * as api from './api';
-import { ConnectProps } from "../types";
+
+import { connect, connection } from "mongoose";
+import { DatabaseConfig, ConnectProps } from "./types";
 
 export default class Database {
-
-  private static _instance: Database;
-  private connection = mongoose.connection;
-
   // * models api
+  Tag = api.Tag;
   User = api.User;
   Note = api.Note;
+  NoteActivity = api.NoteActivity;
   Collaborator = api.Collaborator;
 
-  constructor() {
+  private connection = connection;
+  private static _instance: Database;
+
+  constructor(private configs?: Partial<DatabaseConfig>) {
     return Database._instance ?? (Database._instance = this);
   }
 
@@ -21,18 +22,19 @@ export default class Database {
     return this.connection.close();
   }
 
-  async connect(connectionString: string, options: ConnectProps) {
-    try {
-      this.connection.on('open', () => options.onOpen?.());
-      this.connection.on('close', () => options.onClose?.());
-      this.connection.on('error', () => options.onError?.());
-      this.connection.on('disconnected', () => options.onDisconnect?.());
+  async connect(options?: ConnectProps) {
+    const connectOptions = Object.assign(options ?? {}, (this.configs ?? {}));
 
-      await mongoose.connect(connectionString);
+    try {
+      this.connection.on('open', () => connectOptions.onSuccess?.());
+      this.connection.on('close', () => connectOptions.onClose?.());
+      this.connection.on('error', () => connectOptions.onError?.());
+      this.connection.on('disconnected', () => connectOptions.onDisconnect?.());
+
+      await connect(connectOptions.connectionString!);
 
     } catch (error) {
-      options.onError?.(error);
+      connectOptions.onError?.(error);
     }
   }
-
 }
