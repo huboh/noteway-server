@@ -1,15 +1,16 @@
 import uuid from './uuid';
 import mongo from './mongo';
 import errors from "./errors";
+import authTokenParser from './authTokenParser';
 
 import * as Types from "../types";
-import * as Constants from '../utils/constants';
+import * as Constants from '../constants';
 
 import { Request } from 'express';
 import { MongooseError } from 'mongoose';
 import { ApolloServerExpressConfig } from "apollo-server-express";
 
-
+export * from "./helpers";
 
 export const extractNameFromEmail = (email?: string) => (
   String(email).replace(/@.*/, '')
@@ -18,12 +19,6 @@ export const extractNameFromEmail = (email?: string) => (
 export const isInstanceof = <T extends Function>(value: unknown, classes: T[]): value is T => (
   classes.some((c) => value instanceof c)
 );
-
-export const startServer = ({ app, port, host, server }: Types.StartServerProps) => {
-  app.listen(
-    Number(port), host, () => console.log(`app listening on ${host}:${port}${server?.graphqlPath}`)
-  );
-};
 
 export const validateIdentifiers: Types.ValidateIdentifiers = (ids) => {
   type Key = keyof Parameters<typeof validateIdentifiers>[0];
@@ -113,4 +108,8 @@ export const handleError = (error: unknown) => {
   if (error instanceof MongooseError) {
     handleMongooseError(error);
   }
+};
+
+export const getRequestUserId = (request: Request) => {
+  return (authTokenParser.parse(request.headers, 'Bearer') as any)?.userId;
 };
