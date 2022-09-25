@@ -1,17 +1,21 @@
-import typeDefs from '../../graphql/schema';
+import typeDefs from '../../graphql/typeDefs';
 import resolvers from '../../graphql/resolvers';
 
-import { context } from "../../index";
+import { Context } from '../../types';
 import { formatError } from '../../utils';
-import { ApolloServerExpressConfig } from "apollo-server-express";
+import { ApolloServerExpressConfig, ExpressContext } from "apollo-server-express";
 
-export const apolloServerConfig: ApolloServerExpressConfig = {
-  formatError,
-  resolvers,
-  typeDefs,
-  context,
+export type ContextGetter = (ctx: ExpressContext) => Promise<Context>;
+
+export const getApolloServerConfig = (context: ContextGetter): ApolloServerExpressConfig => {
+  return {
+    formatError,
+    resolvers,
+    typeDefs,
+    context,
+  };
 };
 
 export {
-  apolloServerConfig as default
+  getApolloServerConfig as default
 };
