@@ -1,0 +1,22 @@
+enum Theme {
+  dark
+  light
+  system
+}
+
+enum NoteVisibility {
+  public
+  private
+}
+
+enum NoteSorting {
+  title
+  createdAt
+  updatedAt
+}
+
+enum CollaboratorRole {
+  editor
+  viewer
+  commenter
+}

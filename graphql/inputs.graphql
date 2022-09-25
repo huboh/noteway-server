@@ -1,0 +1,67 @@
+input UserSearchInput {
+  userId: ID
+  email: String
+  username: String
+}
+
+input UserNotesInput {
+  page: Int
+  limit: Int
+  privacy: NoteVisibility
+}
+
+input CollaboratorSearchInput {
+  userId: ID
+  noteId: ID
+}
+
+input UserArchivedNotesInput {
+  userId: ID
+  email: String
+  username: String
+}
+
+input UserSignupInput {
+  email: String!
+  password: ID!
+  username: String
+}
+
+input UserLoginInput {
+  email: String
+  password: ID!
+  username: String
+}
+
+input TagInput {
+  color: Color
+  label: String
+}
+
+input CollaboratorInput {
+  userId: ID!
+  role: CollaboratorRole
+}
+
+input NoteCreateInput {
+  tag: TagInput
+  title: String!
+  content: String!
+  isPinned: Boolean
+  isPrivate: Boolean
+  isStarred: Boolean
+  isArchived: Boolean
+  visibility: NoteVisibility
+  collaborators: [CollaboratorInput!]
+}
+
+input NoteUpdateInput {
+  title: String
+  content: String
+  isArchived: Boolean
+  isPrivate: Boolean
+  isPinned: Boolean
+  isStarred: Boolean
+  isAddedToTrash: Boolean
+  visibility: NoteVisibility
+}
