@@ -11,9 +11,14 @@
       "type": "node-terminal"
     },
     {
-      "command": "npm start",
-      // "name": "Run build",
-      "name": "Start Server",
+      "command": "npm run start",
+      "name": "Server",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
+      "command": "npm run start:dev",
+      "name": "Development Server",
       "request": "launch",
       "type": "node-terminal"
     },
