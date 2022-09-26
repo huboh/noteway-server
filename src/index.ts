@@ -1,47 +1,36 @@
-import Database from './Database';
-import { startServer } from './utils';
-
-import typeDefs from './graphql/schema';
-import resolvers from './graphql/resolvers';
-
+// import Redis from "ioredis";
 import express from 'express';
-import { ApolloServer } from 'apollo-server-express';
+import Database from './Database';
 
+import { startServer, getRequestUserId } from './utils';
+import { ApolloServer, ExpressContext } from 'apollo-server-express';
+import { getDataBaseConfig, getApolloServerConfig } from "./configs";
 
-const { PORT, MONGO_CONNECTION_STRING } = process.env;
-const host = 'localhost';
-const port = PORT || 5000;
+const port = process.env.PORT || 5000;;
+const host = process.env.HOST || "localhost";
 
 const app = express();
-const database = new Database('hey');
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-  context: ({ req: request, res: response }) => ({
-    request,
-    response,
-    userId: request.headers.authorization
-  })
-});
+const database = new Database(getDataBaseConfig());
+const graphQlServer = new ApolloServer(getApolloServerConfig(context));
 
-
-database.connect(MONGO_CONNECTION_STRING!, {
-  onDisconnect: () => {
-    console.log('database connection lost');
-    process.exit(0);
-  },
-
-  onError: (error) => {
-    console.log(`database${error ? ' initial ' : ' '}connection error`);
-    process.exit(1);
-  },
-
-  onOpen: async () => {
-    console.log('connection to database established 🥳');
-
-    await server.start();
-    server.applyMiddleware({ app, path: '/api/graphql' });
-
-    startServer({ app, host, port, server });
+database.connect({
+  onSuccess: () => {
+    graphQlServer.start().then(() => startServer({ app, host, port, server: graphQlServer }));
   }
 });
+
+async function context(gQlContext: ExpressContext) {
+  // TODO: read from cache instead
+  const id = getRequestUserId(gQlContext.req);
+  const user = await database.models.User.findOne({ userId: id });
+
+  return {
+    userId: id,
+    database,
+    user,
+  };
+}
+
+export {
+  context
+};
