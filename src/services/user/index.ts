@@ -1,7 +1,16 @@
-import { database } from "../../";
-import { GetUserProps } from "./types";
+import { NewUser } from "./utils";
+import { database } from "../../index";
+import { UserExistsQuery, GetUserProps, NewUserProps } from "./types";
 
 export const userApi = {
+  async userExists(query: UserExistsQuery) {
+    return database.models.User.exists(query);
+  },
+
+  async createUser(props: NewUserProps) {
+    return database.models.User.create(await NewUser(props));
+  },
+
   async getUser(props: GetUserProps, includePassword?: boolean) {
     const { id, userId, email, username } = props;
 
