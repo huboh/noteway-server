@@ -1,7 +1,9 @@
 import * as api from './api';
+import * as models from './models';
 
 import { connect, connection } from "mongoose";
-import { DatabaseConfig, ConnectProps } from "./types";
+import { DatabaseConfig, ConnectProps, TransactionCallback } from "./types";
+import mongoose, { ClientSession, } from 'mongoose';
 
 export default class Database {
   // * models api
@@ -11,6 +13,7 @@ export default class Database {
   NoteActivity = api.NoteActivity;
   Collaborator = api.Collaborator;
 
+  public models = models;
   private connection = connection;
   private static _instance: Database;
 
@@ -36,5 +39,14 @@ export default class Database {
     } catch (error) {
       connectOptions.onError?.(error);
     }
+  }
+
+  async transaction<T>(callback: TransactionCallback<T>) {
+    const session = await mongoose.startSession();
+    const transactionResult = await session.withTransaction(callback, {});
+
+    await session.endSession();
+
+    return transactionResult;
   }
 }

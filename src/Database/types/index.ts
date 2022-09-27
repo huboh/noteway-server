@@ -1,3 +1,8 @@
+
+import { ClientSession } from 'mongoose';
+
+export type TransactionCallback<T = unknown> = (session: ClientSession) => Promise<T>;
+
 export interface ConnectProps {
   /**
    * handler for `open` event, emitted when mongoose is connected to MongoDB, emitted after the `connected` event is emitted
