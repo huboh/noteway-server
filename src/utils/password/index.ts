@@ -1,17 +1,19 @@
 import bcrypt from 'bcrypt';
 
-const { SALT_ROUNDS } = process.env;
+export const SALT_ROUNDS = Number(process.env.SALT_ROUNDS) || 15;
+export const FakeHashedPassword = `$2b$${SALT_ROUNDS}$invalid_password.dddddddddddddddddddddddddddddddddddd`;
 
-const encrypt = (password: string) => (
-  bcrypt.hash(password, Number(SALT_ROUNDS) || 15)
-);
+export const encrypt = (password: string) => {
+  return bcrypt.hash(password, Number(SALT_ROUNDS) || 15);
+};
 
-const compare = (plainTextPassword: string, hashedPassword: string) => (
-  bcrypt.compare(plainTextPassword, hashedPassword)
-);
+export const compare = (plainTextPassword: string, hashedPassword: string) => {
+  return bcrypt.compare(plainTextPassword, hashedPassword);
+};
 
 export default {
   compare,
   encrypt,
   SALT_ROUNDS,
+  FakeHashedPassword
 };
