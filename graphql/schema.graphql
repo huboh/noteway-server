@@ -184,9 +184,9 @@ type Query {
 
 type Mutation {
   # user object mutation
-  userDelete(userId: ID!): UserDeleteResponse
-  userLogin(loginCredentials: UserLoginInput): UserLoginResponse
-  userSignup(signupCredentials: UserSignupInput): UserSignupResponse
+  userDelete(credentials: UserDeleteInput!): UserDeleteResponse
+  userLogin(loginCredentials: UserLoginInput!): UserLoginResponse
+  userSignup(signupCredentials: UserSignupInput!): UserSignupResponse
 
   # note object mutation
   noteDelete(noteId: ID!): NoteDeleteResponse

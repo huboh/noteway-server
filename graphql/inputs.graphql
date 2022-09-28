@@ -27,6 +27,10 @@ input UserSignupInput {
   username: String
 }
 
+input UserDeleteInput {
+  password: ID!
+}
+
 input UserLoginInput {
   email: String
   password: ID!
