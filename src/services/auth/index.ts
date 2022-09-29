@@ -22,8 +22,9 @@ export const authApi = {
 
   async signupUser(props: SignupUserProps) {
     const credentials = validateSignupCredentials(props.signupCredentials);
+    const credentialsExists = await userApi.userExists({ email: credentials.email });
 
-    if (await userApi.userExists({ email: credentials.email })) {
+    if (credentialsExists) {
       throw new ForbiddenError("email already registered, please login");
     }
 
