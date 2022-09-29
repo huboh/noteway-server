@@ -1,7 +1,7 @@
 import User from '../User';
 
 import * as Types from '../../../types';
-import * as Constants from '../../../utils/constants';
+import * as Constants from '../../../constants';
 
 import { Schema, model } from 'mongoose';
 import mongooseAutoPopulate from 'mongoose-autopopulate';
@@ -18,6 +18,12 @@ const CollaboratorSchema = new Schema({
     type: String, required: true, unique: true
   },
   createdBy: {
+    type: Schema.Types.ObjectId,
+    autopopulate: true,
+    required: true,
+    ref: User,
+  },
+  user: {
     type: Schema.Types.ObjectId,
     autopopulate: true,
     required: true,
