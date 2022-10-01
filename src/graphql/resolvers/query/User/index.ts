@@ -1,29 +1,27 @@
-import { Resolvers, Context, User } from '../../../../types';
+import { User } from '../../../../types';
+import { noteApi } from "../../../../services";
+import { QueryResolvers } from "../../../types";
 
-const user: Resolvers<User, Record<string, any>, Context, any> = {
+const User: QueryResolvers<User> = {
+  notes(user, variables, context) {
+    const filter = variables?.filter || {};
+    const searchQuery = { limit: filter.limit, page: filter.page };
 
-  notes: (user, variables, context) => {
-    const { userId: authorId } = user;
-    const { database, userId } = context;
-    const { limit, page } = variables?.filter || {};
-
-    return database.Note.getNotes({
-      userId, authorId, limit, page
+    return noteApi.getNotes({
+      user: context.user, authorId: user.userId, query: searchQuery
     });
   },
 
-  archivedNotes: (user, variables, context) => {
-    const { userId: authorId } = user;
-    const { database, userId } = context;
-    const { limit, page } = variables?.filter || {};
-    const query = { isArchived: true };
+  archivedNotes(user, variables, context) {
+    const filter = variables?.filter || {};
+    const searchQuery = { limit: filter.limit, page: filter.page, isArchived: true };
 
-    return database.Note.getNotes({
-      userId, authorId, limit, query, page,
+    return noteApi.getNotes({
+      user: context.user, authorId: user.userId, query: searchQuery
     });
   }
 };
 
 export {
-  user as default
+  User as default
 };
