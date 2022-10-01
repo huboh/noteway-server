@@ -45,6 +45,12 @@ type CollaboratorConnection implements Connection {
   pageInfo: PageInfo!
 }
 
+type NoteActivityConnection implements Connection {
+  nodes: [NoteActivity!]!
+  totalNodes: Int!
+  pageInfo: PageInfo!
+}
+
 ### Responses ###
 
 type UserDeleteResponse {
@@ -180,6 +186,7 @@ type Query {
 
   collaborator(filter: CollaboratorSearchInput!): Collaborator
   collaborators(noteId: ID!): CollaboratorConnection
+  noteActivities(noteId: ID!): NoteActivityConnection
 }
 
 type Mutation {
