@@ -1,6 +1,6 @@
 import { QueryResolvers } from "../../types";
-import { noteApi, userApi } from "../../../services";
 import { validateIdentifiers } from '../../../utils';
+import { noteApi, userApi, collaboratorApi, noteActivitiesApi } from "../../../services";
 
 const query: QueryResolvers = {
   me(_source, _variables, context) {
@@ -17,12 +17,24 @@ const query: QueryResolvers = {
     });
   },
 
-  notes: (_source, variables, context) => {
+  notes(_source, variables, context) {
     validateIdentifiers({ uuid: [variables.authorId] });
 
     return noteApi.getNotes({
       authorId: variables.authorId,
       user: context.user,
+    });
+  },
+
+  collaborators(_source, variables, _context) {
+    return collaboratorApi.getCollaborators({
+      noteId: variables.noteId
+    });
+  },
+
+  noteActivities(_source, variables, _context) {
+    return noteActivitiesApi.getNoteActivitiies({
+      noteId: variables.noteId
     });
   },
 
